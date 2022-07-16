@@ -9,6 +9,7 @@ public class AudioChannel
     private static int lastIdx = -1;
 
     private List<AudioSource> sources = new List<AudioSource>();
+    private Dictionary<string, AudioClip> samples;
     private AudioMixerGroup group;
 
     public int Number
@@ -22,42 +23,33 @@ public class AudioChannel
         get;
     }
 
-
-    // File naming scheme: channel/sample.mp3
-    public Dictionary<string, AudioClip> Samples
-    {
-        get;
-        private set;
-    }
-
-    public AudioClip LongestClip
-    {
-        get;
-        private set;
-    }
-
-    public AudioClip ShortestClip
-    {
-        get;
-        private set;
-    }
-
     public float LongestClipDuration
     {
         get;
         private set;
     } = 0.0f;
 
-    public float ShortestClipDuration
-    {
-        get;
-        private set;
-    } = float.MaxValue;
-
     public AudioChannel(string id)
     {
         this.Id = id;
         Number = ++lastIdx;
+    }
+
+    public AudioClip GetSample(string sample)
+    {
+        if (!samples.ContainsKey(sample))
+        {
+            Debug.LogWarning($"Sample {sample} does not exist in channel {Id}!");
+            return null;
+        }
+        return samples[sample];
+    }
+
+    public AudioClip[] GetAllSamples()
+    {
+        AudioClip[] clips = new AudioClip[samples.Count];
+        samples.Values.CopyTo(clips, 0);
+        return clips;
     }
 
     public AudioSource AddSource(AudioSource source)
@@ -105,21 +97,14 @@ public class AudioChannel
         }
         else
         {
-            Samples = new Dictionary<string, AudioClip>();
+            samples = new Dictionary<string, AudioClip>();
             foreach (AudioClip track in tracks)
             {
-                //Debug.Log(track.name);
-                Samples.Add(track.name, track);
+                samples.Add(track.name, track);
 
                 if (track.length > LongestClipDuration)
                 {
                     LongestClipDuration = track.length;
-                    LongestClip = track;
-                }
-                if (track.length < ShortestClipDuration)
-                {
-                    ShortestClipDuration = track.length;
-                    ShortestClip = track;
                 }
             }
         }

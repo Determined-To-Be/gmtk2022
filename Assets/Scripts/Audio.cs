@@ -7,8 +7,8 @@ public class Audio : SingletonBehavior<Audio>
 {
     [SerializeField] private float dicePitchVariation = 0.2f;
 
-    private Queue<AudioClip> q = new Queue<AudioClip>();
     private Dictionary<string, AudioChannel> channels = new Dictionary<string, AudioChannel>();
+    private LinkedList<AudioClip> queue = new LinkedList<AudioClip>();
 
     public AudioMixer Mixer
     {
@@ -47,6 +47,34 @@ public class Audio : SingletonBehavior<Audio>
         //StartCoroutine(TestDice(channels["Dice"].AddSource(gameObject.AddComponent<AudioSource>())));
     }
 
+    public void PlayMusic()
+    {
+        // TODO Play music from last place (or start of queue if nothing in progress)
+    }
+
+    public void PlayMusic(string track)
+    {
+        // TODO Play this track now, stop the other one
+    }
+
+    public void QueueMusic(string track)
+    {
+        QueueMusic(track, false);
+    }
+
+    public void QueueMusic(string track, bool now)
+    {
+        AudioClip clip = channels["Music"].GetSample(track);
+        if (clip == null) return;
+
+        if (now)
+        {
+            queue.AddFirst(clip);
+            return;
+        }
+        queue.AddLast(clip);
+    }
+
     private IEnumerator TestDice(AudioSource source)
     {
         while (true)
@@ -57,15 +85,15 @@ public class Audio : SingletonBehavior<Audio>
 
     public float RollDice(AudioSource source)
     {
-        return RollDice(UnityEngine.Random.Range(channels["Dice"].ShortestClipDuration - 1.0f, channels["Dice"].LongestClipDuration + 5.0f), source);
+        return RollDice(UnityEngine.Random.Range(0.0f, channels["Dice"].LongestClipDuration + 5.0f), source);
     }
 
     public float RollDice(float minDuration, AudioSource source)
     {
         float duration = channels["Dice"].LongestClipDuration + float.Epsilon;
-        AudioClip clip = channels["Dice"].Samples["roll"];
+        AudioClip clip = channels["Dice"].GetSample("roll");
 
-        foreach (AudioClip track in channels["Dice"].Samples.Values)
+        foreach (AudioClip track in channels["Dice"].GetAllSamples())
         {
             if (duration > track.length && track.length > minDuration)
             {
@@ -76,7 +104,6 @@ public class Audio : SingletonBehavior<Audio>
 
         source.pitch = UnityEngine.Random.Range(1.0f - dicePitchVariation, 1.0f + dicePitchVariation);
         source.PlayOneShot(clip);
-        //Debug.Log(clip.name);
         return duration;
     }
 
@@ -85,17 +112,6 @@ public class Audio : SingletonBehavior<Audio>
     {
         AudioSource channel = channels[(int)AudioChannel.MUSIC];
         channel.loop = isEnabled;
-    }
-
-    public void QueueMusic(string track)
-    {
-        if (!samples[(int)AudioChannel.MUSIC].ContainsKey(track))
-        {
-            Debug.LogError($"Track \"{track}\" does not exist!");
-            return;
-        }
-
-        musicQueue.Enqueue(samples[(int)AudioChannel.MUSIC][track]);
     }
 
     public void PlayMusic(string track)
@@ -208,18 +224,5 @@ public class Audio : SingletonBehavior<Audio>
         if (i == 0)
             return null;
         return possible[Random.Range(0, i)];
-    }
-
-    IEnumerator PlayAmbient()
-    {
-        int chin = (int)Channel.ambientPassive;
-        AudioSource chan = channels[chin];
-        while (true)
-        {
-            yield return new WaitForSeconds(Random.Range(ambientPassiveMaxWait, ambientPassiveMinWait));
-            chan.clip = GetRandomSample(channelNames[chin]);
-            chan.Play();
-            yield return new WaitWhile(() => chan.isPlaying);
-        }
     }
 */
