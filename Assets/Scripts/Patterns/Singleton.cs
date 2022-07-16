@@ -2,6 +2,11 @@ public class Singleton<T>
 {
     private static Singleton<T> instance = null;
 
+    public static Singleton<T> Instance
+    {
+        get;
+    }
+
     public static Singleton<T> GetInstance()
     {
         if (instance == null)
