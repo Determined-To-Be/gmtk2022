@@ -8,7 +8,7 @@ public class Audio : SingletonBehavior<Audio>
     [SerializeField] private float dicePitchVariation = 0.2f;
 
     private Dictionary<string, AudioChannel> channels = new Dictionary<string, AudioChannel>();
-    private LinkedList<AudioClip> queue = new LinkedList<AudioClip>();
+    private Dictionary<string, AudioSource> globalSources = new Dictionary<string, AudioSource>();
 
     public AudioMixer Mixer
     {
@@ -35,44 +35,56 @@ public class Audio : SingletonBehavior<Audio>
                 continue;
             }
             channels.Add(channel.Id, channel);
+            globalSources.Add(channel.Id, gameObject.AddComponent<AudioSource>());
+            channel.Register(globalSources[channel.Id]);
         }
         if (channels.Count < 1)
         {
             Debug.LogError("No channels could be initialized!");
             return;
         }
+
+        globalSources["Music"].loop = true;
     }
+
     private void Start()
     {
         //StartCoroutine(TestDice(channels["Dice"].AddSource(gameObject.AddComponent<AudioSource>())));
+        //PlayMusic("tom_wilderness.loop");
+        //StartCoroutine(TestUI());
     }
 
-    public void PlayMusic()
+    public void PlaySound(string channel, string track)
     {
-        // TODO Play music from last place (or start of queue if nothing in progress)
+        globalSources[channel].PlayOneShot(channels[channel].GetSample(track));
+    }
+
+    private IEnumerator TestUI()
+    {
+        while (true)
+        {
+            AudioClip[] samples = channels["UI"].GetAllSamples();
+            AudioClip sample = samples[Mathf.RoundToInt(UnityEngine.Random.Range(0.0f, samples.Length))];
+            PlaySound("UI", sample.name);
+            yield return new WaitForSeconds(1.0f);
+        }
+    }
+
+    public void StopMusic()
+    {
+        globalSources["Music"].Stop();
     }
 
     public void PlayMusic(string track)
     {
-        // TODO Play this track now, stop the other one
-    }
+        AudioSource music = globalSources["Music"];
 
-    public void QueueMusic(string track)
-    {
-        QueueMusic(track, false);
-    }
-
-    public void QueueMusic(string track, bool now)
-    {
-        AudioClip clip = channels["Music"].GetSample(track);
-        if (clip == null) return;
-
-        if (now)
+        if (music.isPlaying)
         {
-            queue.AddFirst(clip);
-            return;
+            music.Stop();
         }
-        queue.AddLast(clip);
+        music.clip = channels["Music"].GetSample(track);
+        music.Play();
     }
 
     private IEnumerator TestDice(AudioSource source)

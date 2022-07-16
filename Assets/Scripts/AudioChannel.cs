@@ -8,7 +8,6 @@ public class AudioChannel
     private static List<DirectoryInfo> sampleDirectories = new List<DirectoryInfo>(new DirectoryInfo("Assets/Resources/Audio").GetDirectories());
     private static int lastIdx = -1;
 
-    private List<AudioSource> sources = new List<AudioSource>();
     private Dictionary<string, AudioClip> samples;
     private AudioMixerGroup group;
 
@@ -52,11 +51,9 @@ public class AudioChannel
         return clips;
     }
 
-    public AudioSource AddSource(AudioSource source)
+    public void Register(AudioSource source)
     {
         source.outputAudioMixerGroup = group;
-        sources.Add(source);
-        return source;
     }
 
     public bool Initialize()
