@@ -47,27 +47,14 @@ public class Audio : SingletonBehavior<Audio>
         globalSources["Music"].loop = true;
     }
 
-    private void Start()
+    public void Register(AudioSource source, string channel)
     {
-        //StartCoroutine(TestDice(channels["Dice"].AddSource(gameObject.AddComponent<AudioSource>())));
-        //PlayMusic("tom_wilderness.loop");
-        //StartCoroutine(TestUI());
+        channels[channel].Register(source);
     }
 
     public void PlaySound(string channel, string track)
     {
         globalSources[channel].PlayOneShot(channels[channel].GetSample(track));
-    }
-
-    private IEnumerator TestUI()
-    {
-        while (true)
-        {
-            AudioClip[] samples = channels["UI"].GetAllSamples();
-            AudioClip sample = samples[Mathf.RoundToInt(UnityEngine.Random.Range(0.0f, samples.Length))];
-            PlaySound("UI", sample.name);
-            yield return new WaitForSeconds(1.0f);
-        }
     }
 
     public void StopMusic()
@@ -85,14 +72,6 @@ public class Audio : SingletonBehavior<Audio>
         }
         music.clip = channels["Music"].GetSample(track);
         music.Play();
-    }
-
-    private IEnumerator TestDice(AudioSource source)
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(RollDice(source));
-        }
     }
 
     public float RollDice(AudioSource source)
@@ -118,123 +97,4 @@ public class Audio : SingletonBehavior<Audio>
         source.PlayOneShot(clip);
         return duration;
     }
-
-    /*
-    public void SetRepeat(bool isEnabled)
-    {
-        AudioSource channel = channels[(int)AudioChannel.MUSIC];
-        channel.loop = isEnabled;
-    }
-
-    public void PlayMusic(string track)
-    {
-        if (!samples[(int)AudioChannel.MUSIC].ContainsKey(track))
-        {
-            Debug.LogError($"Track \"{track}\" does not exist!");
-            return;
-        }
-        AudioSource channel = channels[(int)AudioChannel.MUSIC];
-
-        channel.Stop();
-        channel.clip = samples[(int)AudioChannel.MUSIC][track];
-        channel.Play();
-    }
-
-    private IEnumerator MusicLoop()
-    {
-        AudioSource channel = channels[(int)AudioChannel.MUSIC];
-
-        if (!channel.isPlaying && musicQueue.Count > 0)
-        {
-            channel.clip = musicQueue.Dequeue();
-            channel.Play();
-        }
-
-        yield return new WaitForSeconds(channel.clip.length - channel.time);
-    }*/
 }
-
-/*
-    [SerializeField] float variety, ambientPassiveMaxWait, ambientPassiveMinWait;
-
-    public void PlaySoundOnce(Channel chan, AudioClip smpl, float vol = 1f, float pitch = 1f, bool rand = false)
-    {
-        int chin = (int)chan;
-        channels[chin].volume = vol;
-        channels[chin].pitch = pitch + (rand ? Random.Range(-variety, variety) : 0f);
-        channels[chin].PlayOneShot(smpl);
-    }
-
-    public void PlaySound(Channel chan, AudioClip smpl, float vol = 1f, float pitch = 1f, bool rand = false)
-    {
-        StartCoroutine(PlaySoundThrough(chan, smpl, vol, pitch, rand));
-    }
-
-    IEnumerator PlaySoundThrough(Channel chan, AudioClip smpl, float vol, float pitch, bool rand)
-    {
-        int chin = (int)chan;
-        channels[chin].volume = vol;
-        channels[chin].pitch = pitch + (rand ? Random.Range(-variety, variety) : 0f);
-        channels[chin].clip = smpl;
-        channels[chin].Play();
-        yield return new WaitWhile(() => channels[chin].isPlaying);
-    }
-
-    public void StartSound(Channel chan, AudioClip smpl, float vol = 1f, float pitch = 1f)
-    {
-        int chin = (int)chan;
-        ToggleLoop(chan);
-        channels[chin].volume = vol;
-        channels[chin].pitch = pitch;
-        channels[chin].clip = smpl;
-        channels[chin].Play();
-
-    }
-
-    public void ToggleLoop(Channel chan)
-    {
-        int chin = (int)chan;
-        channels[chin].loop = !channels[chin].loop;
-    }
-
-    public void StopSound(Channel chan)
-    {
-        channels[(int)chan].Stop();
-        ToggleLoop(chan);
-
-    }
-
-    public bool IsPlaying(Channel chan)
-    {
-        return channels[(int)chan].isPlaying;
-    }
-
-    public AudioClip GetSample(string name)
-    {
-        foreach (AudioClip smpl in samples)
-        {
-            if (name.Equals(smpl.name))
-                return smpl;
-        }
-        return null;
-    }
-
-    public AudioSource GetChannel(Channel chan)
-    {
-        return channels[(int)chan];
-    }
-
-    public AudioClip GetRandomSample(string sub)
-    {
-        AudioClip[] possible = new AudioClip[samples.Length];
-        int i = 0;
-        foreach (AudioClip smpl in samples)
-        {
-            if (smpl.name.Contains(sub))
-                possible.SetValue(smpl, i++);
-        }
-        if (i == 0)
-            return null;
-        return possible[Random.Range(0, i)];
-    }
-*/
