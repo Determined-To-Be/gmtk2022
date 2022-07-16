@@ -1,58 +1,51 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 using UnityEngine.Audio;
 
-public class Audio : SingletonBehavior
+public class Audio : SingletonBehavior<Audio>
 {
     [SerializeField] private float dicePitchVariation = 0.2f;
 
-    private enum AudioChannel { MUSIC, UI, DICE, SFX }; // Corresponds to audio group of the same name in the mixer
-    private string[] channelNames;
-    private Queue<AudioClip> musicQueue = new Queue<AudioClip>();
+    private Queue<AudioClip> q = new Queue<AudioClip>();
+    private Dictionary<string, AudioChannel> channels = new Dictionary<string, AudioChannel>();
 
-    private AudioMixer mixer;
-    private AudioSource[] channels;
-    private Dictionary<string, AudioClip>[] samples; // File naming scheme: channel/sample.mp3
+    public AudioMixer Mixer
+    {
+        get;
+        private set;
+    }
 
     protected override void Awake()
     {
         base.Awake();
 
-        mixer = Resources.Load<AudioMixer>("Audio/Master");
-        channelNames = Enum.GetNames(typeof(AudioChannel));
-        channels = new AudioSource[channelNames.Length];
-        samples = new Dictionary<string, AudioClip>[channels.Length];
-
-        // Search audio assets for channel directories and load samples
-        List<DirectoryInfo> audioAssetDirs = new List<DirectoryInfo>(new DirectoryInfo("Assets/Resources/Audio").GetDirectories());
-        for (int channel = 0; channel < channels.Length; channel++)
+        Mixer = Resources.Load<AudioMixer>("Audio/Master");
+        if (Mixer == null)
         {
-            DirectoryInfo matchingDir = audioAssetDirs.Find(dir => dir.Name.ToUpper().Equals(channelNames[channel]));
-            channels[channel] = gameObject.AddComponent<AudioSource>();
-            if (matchingDir != null)
-            {
-                channelNames[channel] = matchingDir.Name;
-            }
-            channels[channel].outputAudioMixerGroup = mixer.FindMatchingGroups(channelNames[channel])[0];
+            Debug.LogError("Master mixer does not exist!");
+            return;
+        }
 
-            AudioClip[] clips = Resources.LoadAll<AudioClip>("Audio/" + channelNames[channel]);
-            foreach (AudioClip clip in clips)
+        foreach (AudioMixerGroup group in Mixer.FindMatchingGroups("Master/"))
+        {
+            AudioChannel channel = new AudioChannel(group.name);
+            if (!channel.Initialize())
             {
-                Debug.Log(clip.name);
-                samples[channel].Add(clip.name, clip);
+                continue;
             }
+            channels.Add(channel.Id, channel);
+        }
+        if (channels.Count < 1)
+        {
+            Debug.LogError("No channels could be initialized!");
+            return;
         }
     }
 
+    /*
     private void Start()
     {
         StartCoroutine(MusicLoop());
-        StartCoroutine(TestDice());
-        QueueMusic("sonatina_letsadventure_7MemoryBox");
-        QueueMusic("sonatina_letsadventure_9MechanicalDancer");
     }
 
 
@@ -127,7 +120,7 @@ public class Audio : SingletonBehavior
 
         channel.pitch = UnityEngine.Random.Range(-dicePitchVariation, dicePitchVariation);
         channel.PlayOneShot(track);
-    }
+    }*/
 }
 
 /*

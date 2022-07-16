@@ -1,13 +1,14 @@
 using UnityEngine;
 
-public abstract class SingletonBehavior : MonoBehaviour
+public abstract class SingletonBehavior<T> : MonoBehaviour where T : MonoBehaviour
 {
-    protected static SingletonBehavior instance = null;
+    private static SingletonBehavior<T> instance = null;
 
-    public static SingletonBehavior Instance
+    public static T GetInstance()
     {
-        get;
+        return instance as T;
     }
+
 
     protected virtual void Awake()
     {
@@ -20,6 +21,5 @@ public abstract class SingletonBehavior : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        
     }
 }
