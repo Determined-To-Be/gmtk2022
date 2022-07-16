@@ -1,18 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
-public class GridModel : SingletonBehavior
+
+public class GridModel : MonoBehaviour
 {
 
     public GridData gridData;
+    public UnityEvent UpdateBoard;
+    public UnityEvent ResetBoard;
 
-    protected override void Awake()
+    protected void Awake()
     {
-        base.Awake();
+        UpdateBoard = new UnityEvent();
+        ResetBoard = new UnityEvent();
+        //base.Awake();
+        gridData.Generate();
     }
-    
-    
-    
-    
+
+    protected void Start() {
+        ResetBoard.Invoke();
+    }
+
 }

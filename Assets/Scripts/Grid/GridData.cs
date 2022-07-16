@@ -7,39 +7,27 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "GridData", menuName = "ScriptableObjects/GridData", order = 1)]
 public class GridData : ScriptableObject
 {
-    public struct Triangle
+    //TODO :: FloodFill Defined shape with Triangles and Squares
+    public Vector2Int GridDimensions;
+
+    public Color primary, secondary;
+
+    //We will still end up with a mostly rectangular grid
+    //[X] [Y] [Z]
+    public Dictionary<Vector2Int, GridObject> triangleGrid;
+
+    public void Generate()
     {
-        //This is a reference to the original gridData
-        //Changing this with change for all
-        public GridData gridData;
-        public Vector3Int position;
+        triangleGrid = new Dictionary<Vector2Int, GridObject>();
         
-        public Triangle[] neighbors
-        {
-            get
-            {
-                return null;
-            }
+        for (int i = 0; i < GridDimensions.x; i++) {
+            for (int j = 0; j < GridDimensions.y; j++) {
+                triangleGrid.Add(new Vector2Int(i, j), new GridObject(ObjectType.empty));
+            }   
         }
     }
 
-
-    //TODO :: FloodFill Defined shape with Triangles and Squares
-    public Vector3Int GridDimensions;
-    public float TriangleWidth;
-
-    
-    //We will still end up with a mostly rectangular grid
-    //[X] [Y] [Z]
-    public Triangle[,,] triangleGrid;
-
-    public void GenerateGrid()
-    {
-        //TODO :: DO SOMETHING!!!!!
-        triangleGrid = new Triangle[GridDimensions.x,GridDimensions.y,GridDimensions.z];
-
-    }
-
+    //TODO :: CHANGE TO VECTOR2INT
     public Vector3Int[] neighbors(Vector3Int a)
     {
         int pointsUp = (a.x + a.y + a.z) == 2 ? -1 : 1;
@@ -70,11 +58,12 @@ public class GridData : ScriptableObject
         if (GridDimensions.y > coords.y || coords.y > 0) {
             return false; //out of bounds
         }
-
-        if (GridDimensions.z > coords.z || coords.z > 0) {
-            return false; //Out of bounds
-        }
         return true;
+    }
+
+    public bool checkCollision(Vector2Int a, Vector2Int b)
+    {
+        return false;
     }
 
 }
