@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -41,14 +42,45 @@ public class Audio : SingletonBehavior<Audio>
             return;
         }
     }
-
-    /*
     private void Start()
     {
-        StartCoroutine(MusicLoop());
+        //StartCoroutine(TestDice(channels["Dice"].AddSource(gameObject.AddComponent<AudioSource>())));
     }
 
+    private IEnumerator TestDice(AudioSource source)
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(RollDice(source));
+        }
+    }
 
+    public float RollDice(AudioSource source)
+    {
+        return RollDice(UnityEngine.Random.Range(channels["Dice"].ShortestClipDuration - 1.0f, channels["Dice"].LongestClipDuration + 5.0f), source);
+    }
+
+    public float RollDice(float minDuration, AudioSource source)
+    {
+        float duration = channels["Dice"].LongestClipDuration + float.Epsilon;
+        AudioClip clip = channels["Dice"].Samples["roll"];
+
+        foreach (AudioClip track in channels["Dice"].Samples.Values)
+        {
+            if (duration > track.length && track.length > minDuration)
+            {
+                clip = track;
+                duration = track.length;
+            }
+        }
+
+        source.pitch = UnityEngine.Random.Range(1.0f - dicePitchVariation, 1.0f + dicePitchVariation);
+        source.PlayOneShot(clip);
+        //Debug.Log(clip.name);
+        return duration;
+    }
+
+    /*
     public void SetRepeat(bool isEnabled)
     {
         AudioSource channel = channels[(int)AudioChannel.MUSIC];
@@ -91,35 +123,6 @@ public class Audio : SingletonBehavior<Audio>
         }
 
         yield return new WaitForSeconds(channel.clip.length - channel.time);
-    }
-
-    private IEnumerator TestDice()
-    {
-        RollDice(UnityEngine.Random.Range(0.0f, samples[(int)AudioChannel.DICE]["blonkus"].length + 1.0f));
-        yield return new WaitForSeconds(4.0f);
-    }
-
-    public void RollDice()
-    {
-        RollDice(0.0f);
-    }
-
-    public void RollDice(float minDuration)
-    {
-        AudioSource channel = channels[(int)AudioChannel.DICE];
-        AudioClip track = samples[(int)AudioChannel.DICE]["blonkus"]; // TODO Bad, assumes blonkus exists
-        float duration = track.length;
-
-        foreach (AudioClip clip in samples[(int)AudioChannel.DICE].Values){
-            if (duration > clip.length && clip.length > minDuration)
-            {
-                track = clip;
-                duration = track.length;
-            }
-        }
-
-        channel.pitch = UnityEngine.Random.Range(-dicePitchVariation, dicePitchVariation);
-        channel.PlayOneShot(track);
     }*/
 }
 
