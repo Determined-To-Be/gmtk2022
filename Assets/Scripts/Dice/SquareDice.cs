@@ -65,6 +65,7 @@ public class SquareDice : MonoBehaviour
         Vector3.forward, 
     };
 
+    //THIS DOESNT F****** WORK!!!
     public int GetDiceFace()
     {
         var maxY = float.NegativeInfinity;
