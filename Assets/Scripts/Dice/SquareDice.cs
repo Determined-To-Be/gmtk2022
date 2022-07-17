@@ -13,6 +13,8 @@ public class SquareDice : MonoBehaviour
     public bool move = false;
     public Direction dir;
 
+    public int currentFace;
+
     public enum Direction
     {
         forward,
@@ -53,17 +55,45 @@ public class SquareDice : MonoBehaviour
             move = false;
             Move(dir);
         }
+
+        currentFace = GetDiceFace();
     }
-    
+
+    private Vector3[] sides = new Vector3[] {
+        Vector3.up,
+        Vector3.right, 
+        Vector3.forward, 
+    };
+
+    public int GetDiceFace()
+    {
+        var maxY = float.NegativeInfinity;
+        var result = -1;
+
+        for (int i = 0; i < 3; i++)
+        {
+            var worldspace = transform.TransformDirection(sides[i]);
+            if (worldspace.y > maxY)
+            {
+                result = i + 1;
+                maxY = worldspace.y;
+            }
+
+            if (-worldspace.y > maxY)
+            {
+                result = 6 - i;
+                maxY = -worldspace.y;
+            }
+        }
+
+        return result;
+    }
+
 
     void Move(Direction e)
     {
         StartCoroutine(MoveAndRotate(e));
     }
-
-
-
-
 
     IEnumerator MoveAndRotate(Direction e)
     {
