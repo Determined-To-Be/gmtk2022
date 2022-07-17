@@ -59,7 +59,7 @@ public class DiceMovement : MonoBehaviour
         goalPosition = rigid.position + directions[direction] * (edgeLength * 0.866f * this.transform.localScale.x);
         Vector3 speedAndDir = directions[direction] * (edgeLength * 0.866f * this.transform.localScale.x);
 
-        angleOfRotation = Vector3.Cross(Vector3.left, directions[direction]);
+        angleOfRotation = Vector3.Cross(Vector3.forward, directions[direction]);
         Quaternion goalRot = rigid.rotation * Quaternion.AngleAxis(rotationAngle, angleOfRotation);
         
         while (Vector3.Distance(rigid.position, goalPosition) > epsilon)
