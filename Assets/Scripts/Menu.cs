@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Menu : MonoBehaviour
@@ -7,7 +8,9 @@ public class Menu : MonoBehaviour
 
     public void Versus()
     {
-        Audio.GetInstance().PlaySound("UI", "error_style_1_001"); // TODO Load game scene
+        Audio.GetInstance().PlayMusic("tom_adventure.loop");
+        Audio.GetInstance().PlaySound("UI", "confirm_style_1_001");
+        SceneManager.LoadScene("VS_Map1");
     }
 
     public void Challenge() {
@@ -37,7 +40,7 @@ public class Menu : MonoBehaviour
 
     public void Quit()
     {
-        Audio.GetInstance().PlaySound("UI", "confirm_style_1_001");
+        Audio.GetInstance().PlaySound("UI", "back_style_1_001");
         Application.Quit();
     }
 
