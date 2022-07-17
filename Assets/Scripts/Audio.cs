@@ -47,6 +47,11 @@ public class Audio : SingletonBehavior<Audio>
         globalSources["Music"].loop = true;
     }
 
+    public void Volume(float vol)
+    {
+        Mixer.SetFloat("masterVolume", vol);
+    }
+
     public void Register(AudioSource source, string channel)
     {
         channels[channel].Register(source);
